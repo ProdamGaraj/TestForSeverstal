@@ -49,11 +49,11 @@ status_codes = http.HTTPStatus
 
 def handle_db_error(err: Exception) -> HTTPException:
     if isinstance(err, NoResultFound):
-        return HTTPException(status_code=404, detail="Resource not found")
+        return HTTPException(status_code=404, detail=f"Resource not found\n{err}")
     elif isinstance(err, IntegrityError):
-        return HTTPException(status_code=400, detail="Integrity error")
+        return HTTPException(status_code=400, detail=f"Integrity error\n{err}")
     else:
-        return HTTPException(status_code=500, detail="Database error")
+        return HTTPException(status_code=500, detail=f"Database error\n{err}")
 
 
 # Эндпоинты API
