@@ -145,10 +145,10 @@ def delete_roll(roll_id: int):
         raise handle_db_error(err)
 
 
-@app.get("/rolls/statistics/", response_model=RollOut)
+@app.get("/rolls/statistics/", response_model=StatsOut)
 def get_statistics(start_date: date, end_date: date):
     try:
-        stats = db.session.query(
+        result = db.session.query(
             func.count(Roll.id).label("total_rolls"),
             func.avg(Roll.length).label("average_length"),
             func.avg(Roll.weight).label("average_weight"),
@@ -160,6 +160,17 @@ def get_statistics(start_date: date, end_date: date):
             Roll.date_added >= start_date,
             Roll.date_added <= end_date
         ).first()
+
+        stats = {
+            "total_rolls": result.total_rolls,
+            "average_length": result.average_length,
+            "average_weight": result.average_weight,
+            "max_length": result.max_length,
+            "min_length": result.min_length,
+            "max_weight": result.max_weight,
+            "min_weight": result.min_weight,
+        }
+
         return stats
     except SQLAlchemyError as err:
         db.session.rollback()

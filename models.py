@@ -33,3 +33,12 @@ class RollOut(BaseModel):
     weight: float
     date_added: date
     date_removed: Optional[date]
+
+class StatsOut(BaseModel):
+    total_rolls: int
+    average_length : float
+    average_weight: float
+    max_length: float
+    min_length: float
+    max_weight: float
+    min_weight: float
