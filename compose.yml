@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  roll-stock-service:
+    container_name: roll-stock-service
+    depends_on:
+      - roll-stock-database
+    image: latest
+    build:
+      context: ./roll-stock-service
+    env_file: .env
+    volumes:
+    - .roll-stock-service/logs/:/app/logs/
+    restart: unless-stopped
+    ports:
+      - '8888:8000'
+    networks:
+      - roll-stock
+
+  roll-stock-database:
+    container_name: roll-stock-database
+    image: postgres:14-alpine3.18
+    build:
+      context: .
+    env_file: .env
+    volumes:
+      - ./pg_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    ports:
+      - '5555:5432'
+    networks:
+      - roll-stock
+
+networks:
+  roll-stock:
+    name: roll-stock-net
