@@ -149,6 +149,20 @@ def delete_roll(roll_id: int):
 @app.get("/rolls/statistics/", response_model=StatsOut)
 def get_statistics(start_date: date, end_date: date):
     try:
+        subquery = db.session.query(
+            Roll.date_added,
+            func.count(Roll.id).label("daily_total_rolls"),
+            func.sum(Roll.weight).label("daily_total_weight")
+        ).filter(
+            Roll.date_added >= start_date,
+            Roll.date_added <= end_date
+        ).group_by(Roll.date_added).subquery()
+
+        min_count_date = db.session.query(subquery.c.date_added).order_by(subquery.c.daily_total_rolls.asc()).first()
+        max_count_date = db.session.query(subquery.c.date_added).order_by(subquery.c.daily_total_rolls.desc()).first()
+        min_weight_date = db.session.query(subquery.c.date_added).order_by(subquery.c.daily_total_weight.asc()).first()
+        max_weight_date = db.session.query(subquery.c.date_added).order_by(subquery.c.daily_total_weight.desc()).first()
+
         result = db.session.query(
             func.count(Roll.id).label("total_rolls"),
             func.avg(Roll.length).label("average_length"),
@@ -170,6 +184,10 @@ def get_statistics(start_date: date, end_date: date):
             "min_length": result.min_length,
             "max_weight": result.max_weight,
             "min_weight": result.min_weight,
+            "min_count_date": min_count_date[0] if min_count_date else None,
+            "max_count_date": max_count_date[0] if max_count_date else None,
+            "min_weight_date": min_weight_date[0] if min_weight_date else None,
+            "max_weight_date": max_weight_date[0] if max_weight_date else None,
         }
 
         return stats

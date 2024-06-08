@@ -42,3 +42,9 @@ class StatsOut(BaseModel):
     min_length: float
     max_weight: float
     min_weight: float
+    min_count_date: date
+    max_count_date: date
+    max_weight_date: date
+    min_weight_date: date
+
+
