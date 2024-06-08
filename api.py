@@ -137,8 +137,9 @@ def delete_roll(roll_id: int):
         db_roll = db.session.query(Roll).filter(Roll.id == roll_id).first()
         if db_roll is None:
             raise HTTPException(status_code=404, detail="Roll not found")
-        db.session.delete(db_roll)
+        setattr(db_roll, "date_removed", date.today())
         db.session.commit()
+        db.session.refresh(db_roll)
         return db_roll
     except SQLAlchemyError as err:
         db.session.rollback()
